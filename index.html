@@ -50,7 +50,7 @@
   }
 
   #slider-container input[type="range"] {
-     margin-bottom: 80px;
+     margin-bottom: 79px;
     width: 100%;
     height: 1px;
     -webkit-appearance: none;
@@ -99,7 +99,15 @@
 
   #slider3-value {
     left: 315px;
-top: 167.5px;
+top: 167px;
+}
+#slider4-value {
+  left: 315px;
+top: 252px;
+}
+#slider5-value {
+  left: 315px;
+top: 338px;
   }
            </style>
         <script>
@@ -131,7 +139,10 @@ top: 167.5px;
           <input type="range" min="0" max="1" step="0.01" value="0" id="slider2" >
            <span id="slider3-value" class="slider-value"></span>
           <input type="range" min="0" max="1" step="0.01" value="0.5" id="slider3" >
-
+          <span id="slider4-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0" id="slider4" >
+           <span id="slider5-value" class="slider-value"></span>
+          <input type="range" min="0" max="1" step="0.01" value="0.5" id="slider5" >
 
         <script>
         function attachSliderListeners(sliderId) {
@@ -158,7 +169,8 @@ top: 167.5px;
 attachSliderListeners('slider1');
 attachSliderListeners('slider2');
 attachSliderListeners('slider3');
-
+attachSliderListeners('slider4');
+attachSliderListeners('slider5');
 
        </script>
 

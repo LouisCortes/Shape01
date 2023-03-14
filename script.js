@@ -320,10 +320,10 @@ float dd1 (vec3 p ){
      p *= (1.-s2*0.525);
   float d1 = 1000.;
   for(int  i = 1 ; i < 11 ; i++){
-  float fa = atan(p.x,p.y)*(1.+floor(s1*7.))+float(i)*pi*0.1;
+  float fa = atan(p.x,p.y)*(1.+floor(s1*7.))+float(i)*pi*(0.1+0.15*s5);
   float ra = cos(fa);
   float ra2 = sin(fa);
-   d1 = min(d1,length(length(vec2(length(p.xy)-(8.-5.*s2)+ra,p.z+ra2)))-0.5+(-s3+0.5)*0.6);
+   d1 = min(d1,length(length(vec2(length(p.xy)-(8.-5.*s2)+ra,p.z+ra2*mix(1.,5.,s4))))-0.5+(-s3+0.5)*0.6);
    }
    return d1;
 }
@@ -348,7 +348,21 @@ float dd1 (vec3 p ){
         dd +=d;
       }return dd;}
       vec3 nor(vec3 p){ vec2 e  = vec2(0.01,0.); return normalize(map(p)-vec3(map(p-e.xyy),map(p-e.yxy),map(p-e.yyx)));}
-
+      vec2 render(vec3 p, vec3 r){
+       float dd = 0.;
+       float r1 = 0.;
+        for(int  i = 0 ; i <3 ;i++){
+        float d = rm(p,r);
+        if (i == 0 ){dd =step( d,30.);}
+          if(step(0.5,zl)>0.){
+            vec3 pp = p+r*d;
+            vec3 n = nor(pp);
+            r = n*vr();
+            p = pp +0.1*r;
+          }
+          else{r1=1.;break;}
+        }
+          return vec2(r1,dd);}
     void main () {
         vec2 uv = -1. + 2. *  vUv;
     vec2 uc = vUv;
@@ -358,25 +372,18 @@ float dd1 (vec3 p ){
   se += time;
   vec3 p = vec3(0.,0.,-19.);
   vec3 r  = normalize(vec3(uv,1.5));
-  float r1 = 0.;
-  float dd = 0.;
-  for(int  j = 0 ; j <3 ;j++){
-  float d = rm(p,r);
-  if (j == 0 ){dd = d;}
-    if(step(0.5,zl)>0.){
-      vec3 pp = p+r*d;
-      vec3 n = nor(pp);
-      r = n*vr();
-      p = pp +0.1*r;
-    }
-    else{r1=1.;break;}
+  float ss = 0.96;
+      float iframe = mix(texture2D(uTarget,uc).a, 0.0, clamp(mousez+test2, 0.0, 1.0));
+  {
+    ss += mix(0.00, 0.1, clamp(iframe / 400.0, 0.0, 1.0));
+      ss = clamp(ss, 0.0, 1.);
   }
-    float ss = 0.96;
-        float iframe = mix(texture2D(uTarget,uc).a, 0.0, clamp(mousez+test2, 0.0, 1.0));
-    {
-    	ss += mix(0.00, 0.1, clamp(iframe / 400.0, 0.0, 1.0));
-        ss = clamp(ss, 0.0, 1.);
-    }
+//  vec2 res  = render(p,r);
+vec2 res = ss==1.?texture2D(uTarget,uc).xy: render(p,r);
+  float r1 = res.x;
+  float dd =res.y;
+
+
     float c = 0.;
 
     for(float k = -0.5*b; k<=0.5*b ; k +=1.)
@@ -385,9 +392,9 @@ float dd1 (vec3 p ){
     }
     c /= 12.;
     c = smoothstep(0.5,1.,c);
-    float c2 = mix(step(dd,30.),c,step(mousez+test2,0.));
+    float c2 = mix(dd,c,step(mousez+test2,0.));
     float rr= mix(r1, texture2D(uTarget,uc).x, mix(ss, 0.0, clamp(mousez+test2, 0.0, 1.0)));
-      gl_FragColor = vec4(rr,step(dd,30.),rr*c2, iframe + 1.0);
+      gl_FragColor = vec4(rr,dd,rr*c2, iframe + 1.0);
     //    gl_FragColor = vec4(test2,test2,test2, iframe + 1.0);
     }
 `);
@@ -608,7 +615,14 @@ function gene(value, sliderId) {
     document.getElementById("slider3-value").textContent = value.toFixed(2);
       s3 = value;
       break;
-
+      case 'slider4':
+      document.getElementById("slider4-value").textContent = value.toFixed(2);
+        s4 = value;
+        break;
+      case 'slider5':
+      document.getElementById("slider5-value").textContent = value.toFixed(2);
+        s5 = value;
+        break;
 
     default:
       break;
@@ -627,8 +641,8 @@ function splat () {
     gl.uniform1f(splatProgram.uniforms.s1,s1);
     gl.uniform1f(splatProgram.uniforms.s2,s2);
     gl.uniform1f(splatProgram.uniforms.s3,s3);
-    //gl.uniform1f(splatProgram.uniforms.s4,s4);
-  //  gl.uniform1f(splatProgram.uniforms.s5,s5);
+    gl.uniform1f(splatProgram.uniforms.s4,s4);
+    gl.uniform1f(splatProgram.uniforms.s5,s5);
     gl.uniform1f(splatProgram.uniforms.test2,p1);
     //gl.uniform2f(splatProgram.uniforms.prevmouse, pointers[0].prevTexcoordX, pointers[0].prevTexcoordY);
     gl.uniform1i(splatProgram.uniforms.uTarget, dye.read.attach(0));
