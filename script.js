@@ -329,8 +329,8 @@ float dd1 (vec3 p ){
 }
 
   float map(vec3 p){
-    float d2 =min(-p.y+10.,p.y+10.);
-    float d4 = (length(p.xz)-21.);
+    float d2 =min(+p.y+400.,-p.y+50.);
+    float d4 = (length(p.xz)-20.);
     p.xz *= rot((mouse.x-0.5)*3.14*4.);
     p.yz *= rot((mouse.y-0.5)*3.14*4.);
     zl = d2;
@@ -357,7 +357,7 @@ float dd1 (vec3 p ){
           if(step(0.5,zl)>0.){
             vec3 pp = p+r*d;
             vec3 n = nor(pp);
-            r = n*vr();
+            r = n+vr();
             p = pp +0.1*r;
           }
           else{r1=1.;break;}
@@ -394,7 +394,7 @@ vec2 res = ss==1.?texture2D(uTarget,uc).xy: render(p,r);
     c = smoothstep(0.5,1.,c);
     float c2 = mix(dd,c,step(mousez+test2,0.));
     float rr= mix(r1, texture2D(uTarget,uc).x, mix(ss, 0.0, clamp(mousez+test2, 0.0, 1.0)));
-      gl_FragColor = vec4(rr,dd,rr*c2, iframe + 1.0);
+      gl_FragColor = vec4(rr,dd,rr*mix(0.01,1.,c2), iframe + 1.0);
     //    gl_FragColor = vec4(test2,test2,test2, iframe + 1.0);
     }
 `);
